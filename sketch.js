@@ -1,21 +1,22 @@
-let outerShapeMargin = 145;
+let outerShapeMargin = 100;
 let shapesColorMix = 0;
 let shapesColorEasing = 0.0007; // 1.0 to 0
 let backgroundColorMix = 0;
 let backgroundColorEasing = 0.0008;
+let radius = 10;
 
-// Ring stuff
-let numRings;
-let ringWidth;
-let largestRadius;
+// Square stuff
+let numSquares;
+let squareWidth;
+let largestSideLength;
 let overlap;
 let centerX;
 let centerY;
 let showText = true;
-let promptText = "[v14] Click to start sounds ... ";
+let promptText = "Click to start sounds ... ";
 // Colors
-let ringStartColor = [];
-let ringEndColor = [];
+let squareStartColor = [];
+let squareEndColor = [];
 let centreStartColor, centreEndColor;
 let backgroundStartColor, backgroundEndColor;
 // Sounds/Samples
@@ -110,12 +111,8 @@ let soundScheduler = [
 function setup() {
   colorMode(HSB);
   createCanvas(windowWidth, windowHeight);
-  initRings();
+  initSquares();
   initColors();
-}
-
-function myLoadSoundXX(path) {
-  return loadSound(path);
 }
 
 function myLoadSound(path) {
@@ -128,12 +125,6 @@ function myLoadSound(path) {
   // s.play();
   audio.autoplay = true;
   return audio;
-}
-
-function preload() {
-  // soundScheduler.forEach(
-  //   (item) => (item.audio = myLoadSound(`${soundFolder}/${item.file}`))
-  // );
 }
 
 function createAudioObjects() {
@@ -165,21 +156,21 @@ function touchStarted() {
   document.documentElement.requestFullscreen();
 }
 
-function initRings() {
-  // Ring stuff
-  numRings = 3; // Number of concentric rings
-  largestRadius = min(height, width) / 2 - outerShapeMargin; // Radius of the largest ring
-  overlap = 5; // Amount of overlap between rings
+function initSquares() {
+  // Square stuff
+  numSquares = 3; // Number of concentric squares
+  largestSideLength = (min(height, width) / 2 - outerShapeMargin) *2; // Radius of the largest square
+  overlap = 5; // Amount of overlap between squares
   centerX = width / 2; // X-coordinate of the center
   centerY = height / 2; // Y-coordinate of the center
-  ringWidth = largestRadius / numRings; // Width of each ring
+  squareWidth = largestSideLength / numSquares; // Width of each square
 }
 
 function initColors() {
   // Color stuff
-  for (let i = 0; i < numRings - 1; i++) {
-    ringStartColor.push(colorFactory.newRandomRingColor());
-    ringEndColor.push(colorFactory.newRandomRingColor());
+  for (let i = 0; i < numSquares - 1; i++) {
+    squareStartColor.push(colorFactory.newRandomSquareColor());
+    squareEndColor.push(colorFactory.newRandomSquareColor());
   }
 
   centreStartColor = colorFactory.newRandomCentreColor();
@@ -197,71 +188,66 @@ function drawShapes() {
   );
   background(backgroundColor); // Set the background color
 
-  // Draw the concentric rings
-  for (let i = 0; i < numRings; i++) {
-    let outerRadius = largestRadius - i * ringWidth; // Calculate radius for each ring
+  // Draw the concentric squares
+  for (let i = 0; i < numSquares; i++) {
+    let outerRadius = largestSideLength - i * squareWidth; // Calculate radius for each square
 
-    if (i < numRings - 1) {
-      let ringColor = lerpColor(
-        ringStartColor[i],
-        ringEndColor[i],
+    if (i < numSquares - 1) {
+      let squareColor = lerpColor(
+        squareStartColor[i],
+        squareEndColor[i],
         shapesColorMix
       );
-      drawRing(outerRadius, ringColor, backgroundColor);
+       drawFilledSquare(outerRadius, squareColor, backgroundColor);
     } else {
       let centreColor = lerpColor(
         centreStartColor,
         centreEndColor,
         shapesColorMix
       );
-      drawCircle(outerRadius, centreColor);
+       drawSquare(outerRadius, centreColor);
     }
   }
 }
 
-function drawRing(outerRadius, color, backgroundColor) {
-  let outerDiameter = outerRadius * 2; // Calculate diameter
-  let innerRadius = outerRadius - ringWidth; // Calculate radius for each ring
-  let innerDiameter = innerRadius * 2; // Calculate diameter
+function drawFilledSquare(outerSideLength, color, backgroundColor) {
+  let outerDiameter = outerSideLength * 2; // Calculate diameter
+  let innerSideLength = outerSideLength - squareWidth; // Calculate radius for each square
 
-  drawGlow(outerDiameter, color);
+  drawGlow(outerDiameter/2, color);
 
   // ==========================================================================
-  // the ring
+  // the square
   // ==========================================================================
   beginShape();
   noStroke();
   fill(color); // Set fill color to the generated pastel color
-  ellipse(centerX, centerY, outerDiameter, outerDiameter);
-  // draw the "inner ring" filled with the canvas background color
-  fill(backgroundColor); // Set fill color to the background color
-  ellipse(centerX, centerY, innerDiameter, innerDiameter);
+  // draw the "inner square" filled with the canvas background color
+  rectMode(CENTER);
+  rect(centerX, centerY, outerSideLength, outerSideLength, radius);
   endShape();
 }
 
-function drawCircle(outerRadius, color) {
-  let outerDiameter = outerRadius * 2; // Calculate diameter
+function drawSquare(outerSideLength, color) {
+  let halfSize = outerSideLength / 2;
 
-  drawGlow(outerDiameter, color);
+  drawGlow(outerSideLength, color);
 
   beginShape();
   noStroke();
-  // stroke(255, 255, 255, 45);
-  // strokeWeight(overlap);
   fill(color); // Set fill color to the generated pastel color
-  ellipse(centerX, centerY, outerDiameter, outerDiameter);
-  endShape();
+  rectMode(CENTER);
+  rect(centerX, centerY, outerSideLength, outerSideLength);
 
   beginShape();
   noFill();
 }
 
-function drawGlow(outerDiameter, color) {
+function drawGlow(outerSize, color) {
   // ==========================================================================
   // the glow
   // ==========================================================================
-  // draw the light "glow" around the outside of the ring
-  beginShape();
+  // draw the light "glow" around the outside of the square
   let h = color.levels[0];
   let s = color.levels[1];
   let b = color.levels[2];
@@ -275,17 +261,17 @@ function drawGlow(outerDiameter, color) {
   let outlines = 20 * scaler;
   for (let outline = 0; outline < outlines; outline += 2) {
     strokeWeight(outline);
-    ellipse(centerX, centerY, outerDiameter + outline, outerDiameter + outline);
+    let sizeWithOutline = outerSize + outline;
+    rectMode(CENTER);
+    rect(centerX, centerY, sizeWithOutline, sizeWithOutline);
   }
-  colorMode(HSB);
-
-  endShape();
+  colorMode(HSB);   
 }
 
 function rotateColors() {
-  for (let i = 0; i < numRings; i++) {
-    ringStartColor[i] = ringEndColor[i];
-    ringEndColor[i] = colorFactory.newRandomRingColor();
+  for (let i = 0; i < numSquares; i++) {
+    squareStartColor[i] = squareEndColor[i];
+    squareEndColor[i] = colorFactory.newRandomSquareColor();
   }
 
   centreStartColor = centreEndColor;
@@ -339,7 +325,7 @@ function scheduleSound(item) {
 /* full screening will change the size of the canvas */
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
-  initRings();
+  initSquares();
 }
 
 /* prevents the mobile browser from processing some default

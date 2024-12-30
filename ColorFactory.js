@@ -1,5 +1,5 @@
 class ColorFactory {
-  newRandomRingColor() {
+  newRandomSquareColor() {
     let hue = random(0, 360);
     let saturation = random(80, 100);
     let brightness = random(90, 100);
