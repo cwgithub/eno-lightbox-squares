@@ -1,3 +1,4 @@
+
 let outerShapeMargin = 100;
 let shapesColorMix = 0;
 let shapesColorEasing = 0.0007; // 1.0 to 0
@@ -6,7 +7,7 @@ let backgroundColorEasing = 0.0008;
 let radius = 10;
 
 // Square stuff
-let numSquares;
+let numSquares = 2; // Number of concentric squares
 let squareWidth;
 let largestSideLength;
 let overlap;
@@ -158,8 +159,7 @@ function touchStarted() {
 
 function initSquares() {
   // Square stuff
-  numSquares = 3; // Number of concentric squares
-  largestSideLength = (min(height, width) / 2 - outerShapeMargin) *2; // Radius of the largest square
+  largestSideLength = (min(height, width) / 2 - outerShapeMargin) * 2; // Radius of the largest square
   overlap = 5; // Amount of overlap between squares
   centerX = width / 2; // X-coordinate of the center
   centerY = height / 2; // Y-coordinate of the center
@@ -198,14 +198,14 @@ function drawShapes() {
         squareEndColor[i],
         shapesColorMix
       );
-       drawFilledSquare(outerRadius, squareColor, backgroundColor);
+      drawFilledSquare(outerRadius, squareColor, backgroundColor);
     } else {
       let centreColor = lerpColor(
         centreStartColor,
         centreEndColor,
         shapesColorMix
       );
-       drawSquare(outerRadius, centreColor);
+      drawSquare(outerRadius, centreColor);
     }
   }
 }
@@ -214,7 +214,7 @@ function drawFilledSquare(outerSideLength, color, backgroundColor) {
   let outerDiameter = outerSideLength * 2; // Calculate diameter
   let innerSideLength = outerSideLength - squareWidth; // Calculate radius for each square
 
-  drawGlow(outerDiameter/2, color);
+  drawGlow(outerDiameter / 2, color);
 
   // ==========================================================================
   // the square
@@ -265,7 +265,7 @@ function drawGlow(outerSize, color) {
     rectMode(CENTER);
     rect(centerX, centerY, sizeWithOutline, sizeWithOutline);
   }
-  colorMode(HSB);   
+  colorMode(HSB);
 }
 
 function rotateColors() {
@@ -334,3 +334,81 @@ function windowResized() {
 document.ontouchmove = function (event) {
   event.preventDefault();
 };
+
+
+/*
+
+Glowing outline
+---------------
+
+let pg;
+
+function setup() {
+  createCanvas(400, 400);
+  
+  // Create a graphics buffer
+  pg = createGraphics(400, 400);
+  
+  // Draw the pink square on the buffer
+  pg.background(0, 255, 0); // Green background
+  pg.noStroke();
+  pg.fill(255, 0, 255); // Pink
+  pg.rectMode(CENTER);
+  pg.rect(width / 2, height / 2, 200, 200);
+
+  // Apply a blur filter to the graphics
+  pg.filter(BLUR, 10); // Adjust the blur radius as needed
+  
+  // Draw the buffer onto the canvas
+  image(pg, 0, 0);
+}
+
+----------------------------------------
+
+Approach: Combining a Gradient and Blur
+We can use a combination of filter(BLUR) and transparent gradient layers for this purpose.
+
+
+let pg;
+
+function setup() {
+  createCanvas(400, 400);
+
+  // Create a green background
+  background(0, 255, 0);
+
+  // Create a graphics buffer for the glow
+  pg = createGraphics(400, 400);
+  pg.noStroke();
+
+  // Draw the large square with a soft glow effect
+  createGlow(pg, width / 2, height / 2, 250, color(255, 0, 255, 150));
+
+  // Add the pink central square
+  fill(255, 0, 255); // Pink square
+  noStroke();
+  rectMode(CENTER);
+  rect(width / 2, height / 2, 200, 200);
+
+  // Draw the buffer onto the main canvas
+  image(pg, 0, 0);
+}
+
+// Function to create a glowing square
+function createGlow(buffer, x, y, size, col) {
+  // Draw multiple translucent layers for gradient glow
+  for (let i = 0; i < 50; i++) {
+    let alpha = map(i, 0, 50, 50, 0); // Gradient fading outward
+    buffer.fill(red(col), green(col), blue(col), alpha); // Same color with fading opacity
+    buffer.rectMode(CENTER);
+    buffer.rect(x, y, size + i * 5, size + i * 5); // Expand size outward
+  }
+
+  // Optionally, apply a slight blur for smoothness
+  buffer.filter(BLUR, 6); // Adjust radius for more/less blur
+}
+
+
+
+ 
+ */
