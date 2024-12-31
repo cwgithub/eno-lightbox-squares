@@ -14,7 +14,7 @@ let overlap;
 let centerX;
 let centerY;
 let showText = true;
-let promptText = "Click to start sounds ... ";
+let promptText = "Click to start sounds";
 // Colors
 let squareStartColor = [];
 let squareEndColor = [];
